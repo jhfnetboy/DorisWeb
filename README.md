@@ -54,9 +54,24 @@ brew install cloudflared
 
 #### 2. 配置并启动 Xray 服务
 
-1.  **创建Xray配置文件**:
-    Xray的配置文件路径为 `/usr/local/etc/xray/config.json`。请用以下内容替换该文件：
+1.  **确定并创建Xray配置目录**:
+    根据你Mac芯片架构的不同，Homebrew的配置路径也不同：
+    *   **Apple Silicon (M1/M2/M3等芯片)**: 路径为 `/opt/homebrew/etc/xray/`
+    *   **Intel 芯片**: 路径为 `/usr/local/etc/xray/`
 
+    请根据你的设备，执行对应的命令创建目录（如果目录已存在，则无需操作）：
+    ```bash
+    # Apple Silicon Mac 用户执行:
+    mkdir -p /opt/homebrew/etc/xray
+
+    # Intel Mac 用户执行:
+    mkdir -p /usr/local/etc/xray
+    ```
+
+2.  **创建Xray配置文件**:
+    在上一步创建的目录中，新建一个 `config.json` 文件。例如，对于Apple Silicon Mac，文件路径为 `/opt/homebrew/etc/xray/config.json`。
+
+    将以下内容写入 `config.json` 文件：
     ```json
     {
       "inbounds": [
@@ -88,11 +103,16 @@ brew install cloudflared
     }
     ```
 
-2.  **修改关键参数**:
-    *   `id`: 访问 [UUID在线生成网站](https://www.uuidgenerator.net/) 生成一个UUID，并替换掉 `"在此处替换为你自己的UUID"`。**这是你的连接密码，请务必替换**。
+3.  **修改关键参数**:
+    *   `id`: 你需要一个UUID作为连接密码。**推荐**在Mac终端中通过以下命令本地生成，它更安全、更快捷：
+        ```bash
+        uuidgen
+        ```
+        执行后，将返回的一长串字符（例如 `F8A8B8E0-5E3C-4F9B-8F1A-1B8E9D6C2A0B`）复制并替换掉配置文件中的 `"在此处替换为你自己的UUID"`。
+        或者，你也可以访问 [UUID在线生成网站](https://www.uuidgenerator.net/) 来生成。
     *   `path`: 将 `"/your_secret_path"` 修改为一个自定义的、不易猜到的路径，例如 `"/doris-1234"`。**记住这个路径，客户端配置时需要**。
 
-3.  **启动Xray服务**:
+4.  **启动Xray服务**:
     使用 `brew services` 将Xray作为系统服务在后台运行，这样开机后会自动启动。
     ```bash
     brew services start xray
@@ -143,6 +163,7 @@ brew install cloudflared
 
 6.  **将Tunnel作为服务运行**:
     为了让隧道也能开机自启，我们需要为它创建一个系统服务。
+    *   确定 `cloudflared` 可执行文件路径。Apple Silicon Mac 通常在 `/opt/homebrew/bin/cloudflared`，Intel Mac 在 `/usr/local/bin/cloudflared`。
     *   创建 `launchd` 配置文件：
         ```bash
         touch ~/Library/LaunchAgents/com.cloudflare.cloudflared.plist
@@ -157,7 +178,7 @@ brew install cloudflared
             <string>com.cloudflare.cloudflared</string>
             <key>ProgramArguments</key>
             <array>
-              <string>/usr/local/bin/cloudflared</string>
+              <string>/opt/homebrew/bin/cloudflared</string> <!-- Intel Mac 请改为 /usr/local/bin/cloudflared -->
               <string>tunnel</string>
               <string>--config</string>
               <string>/Users/<你的Mac用户名>/.cloudflared/config.yml</string>
