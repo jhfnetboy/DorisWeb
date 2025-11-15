@@ -210,7 +210,7 @@ brew install cloudflared
 在需要上网的设备上（手机、电脑）下载对应的客户端软件。
 
 *   **Windows**: `v2rayN`
-*   **macOS**: `V2RayU`
+*   **macOS**: `V2RayU`: https://en.v2rayu.org/download/
 *   **Android**: `V2RayNG`
 *   **iOS**: `Shadowrocket` (小火箭, 付费) 或 `FoXray` (免费)
 
